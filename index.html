@@ -3,78 +3,75 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Авторика — читать книги</title>
+<title>LevBook — читать книги онлайн</title>
 
 <style>
-:root{
-  --bg:#0f0f0f;
-  --card:#1c1c1c;
-  --text:#f2f2f2;
-  --muted:#9a9a9a;
-  --accent:#1d9bf0;
-}
 body{
   margin:0;
-  font-family: system-ui, -apple-system, BlinkMacSystemFont;
-  background:var(--bg);
-  color:var(--text);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto;
+  background:#f5f6f7;
+  color:#222;
 }
 header{
-  padding:20px;
+  background:#fff;
+  border-bottom:1px solid #ddd;
+  padding:14px;
   text-align:center;
-  border-bottom:1px solid #222;
 }
+header h1{margin:0;font-size:22px}
 nav{
   display:flex;
   justify-content:center;
-  gap:24px;
-  padding:12px;
-  background:#141414;
+  gap:20px;
+  background:#fff;
+  padding:10px;
+  border-bottom:1px solid #ddd;
 }
 nav button{
   background:none;
   border:none;
-  color:var(--text);
-  font-size:16px;
+  font-size:15px;
 }
-section{display:none;padding:16px}
-section.active{display:block}
+main{padding:16px}
+.hidden{display:none}
 .card{
-  background:var(--card);
-  border-radius:14px;
-  padding:16px;
-  margin-bottom:16px;
+  background:#fff;
+  border-radius:10px;
+  padding:12px;
+  margin-bottom:14px;
+  display:flex;
+  gap:12px;
 }
-.book-title{
-  font-size:18px;
-  font-weight:600;
+.cover{
+  width:70px;
+  height:100px;
+  background:#ccc;
+  border-radius:6px;
 }
+.info{flex:1}
+.title{font-weight:600}
 .author{
+  color:#555;
+  font-size:14px;
   display:flex;
   align-items:center;
-  gap:6px;
-  color:var(--muted);
-  margin-top:4px;
+  gap:5px;
 }
-.like-btn{
-  margin-top:12px;
-  background:none;
-  border:1px solid #333;
-  color:var(--text);
-  padding:8px 14px;
-  border-radius:20px;
-  font-size:15px;
+.verify{width:14px;height:14px}
+.chapter{
+  padding:10px;
+  border-bottom:1px solid #eee;
+}
+.read{
+  background:#fff;
+  padding:16px;
+  border-radius:10px;
+  line-height:1.6;
 }
 footer{
   text-align:center;
-  color:#666;
+  color:#888;
   padding:20px;
-}
-
-/* Галочка */
-.verify{
-  width:16px;
-  height:16px;
 }
 </style>
 </head>
@@ -82,106 +79,125 @@ footer{
 <body>
 
 <header>
-  <h1>Авторика</h1>
-  <p style="color:var(--muted)">Платформа для писателей и читателей</p>
+  <h1>LevBook</h1>
+  <div style="color:#666;font-size:14px">Платформа для чтения книг</div>
 </header>
 
 <nav>
-  <button onclick="openTab('feed')">Лента</button>
-  <button onclick="openTab('read')">Читать</button>
+  <button onclick="openTab('home')">Главная</button>
   <button onclick="openTab('authors')">Авторы</button>
 </nav>
 
-<section id="feed" class="active"></section>
-<section id="read"></section>
-<section id="authors"></section>
+<main>
 
-<footer>© Авторика</footer>
+<section id="home"></section>
+
+<section id="book" class="hidden"></section>
+
+<section id="read" class="hidden"></section>
+
+<section id="authors" class="hidden"></section>
+
+</main>
+
+<footer>© LevBook</footer>
 
 <script>
-// ===== АДМИН НАСТРОЙКИ =====
-const verifiedAuthors = ["Алекс Ворон"];
+// ===== АДМИН =====
+const verifiedAuthors = ["Лев"];
+// =================
 
-const books = [
-  {
-    title:"Тень Севера",
-    author:"Алекс Ворон",
-    text:"Глава 1\n\nХолодный ветер бил в лицо..."
-  },
-  {
-    title:"Новая история",
-    author:"Новый Автор",
-    text:"История начинается здесь..."
-  }
-];
-// ===========================
-
-// SVG галочка
+// Галочка
 const verifyIcon = `
-<svg class="verify" viewBox="0 0 24 24" fill="none">
-<path d="M22 12c0 5.52-4.48 10-10 10S2 17.52 2 12 6.48 2 12 2s10 4.48 10 10z" fill="#1d9bf0"/>
-<path d="M10.5 13.5l-2-2 1.4-1.4 0.6 0.6 3.6-3.6 1.4 1.4-5 5z" fill="white"/>
-</svg>
-`;
+<svg class="verify" viewBox="0 0 24 24">
+<circle cx="12" cy="12" r="12" fill="#1d9bf0"/>
+<path d="M7 12l3 3 7-7" stroke="#fff" stroke-width="2" fill="none"/>
+</svg>`;
 
-function verified(name){
+// Данные
+const books = [
+{
+  id:1,
+  title:"Первая книга",
+  author:"Лев",
+  description:"Пример книги для демонстрации платформы.",
+  chapters:[
+    {title:"Глава 1", text:"Текст первой главы..."},
+    {title:"Глава 2", text:"Текст второй главы..."}
+  ]
+},
+{
+  id:2,
+  title:"Вторая история",
+  author:"Автор Без Галочки",
+  description:"Ещё одна демонстрационная книга.",
+  chapters:[
+    {title:"Глава 1", text:"Начало истории..."}
+  ]
+}
+];
+
+function isVerified(name){
   return verifiedAuthors.includes(name) ? verifyIcon : "";
 }
 
 function openTab(id){
-  document.querySelectorAll("section").forEach(s=>s.classList.remove("active"));
-  document.getElementById(id).classList.add("active");
+  document.querySelectorAll("section").forEach(s=>s.classList.add("hidden"));
+  document.getElementById(id).classList.remove("hidden");
 }
 
-// Лента
-const feed = document.getElementById("feed");
-books.forEach((b,i)=>{
-  feed.innerHTML += `
-  <div class="card" onclick="openBook(${i})">
-    <div class="book-title">${b.title}</div>
-    <div class="author">
-      ${b.author}
-      ${verified(b.author)}
+// Главная
+const home=document.getElementById("home");
+books.forEach(b=>{
+  home.innerHTML+=`
+  <div class="card" onclick="openBook(${b.id})">
+    <div class="cover"></div>
+    <div class="info">
+      <div class="title">${b.title}</div>
+      <div class="author">${b.author} ${isVerified(b.author)}</div>
+      <div style="font-size:14px;color:#666">${b.description}</div>
     </div>
   </div>`;
 });
 
-// Чтение
-function openBook(i){
-  openTab("read");
-  let likes = localStorage.getItem("like"+i) || 0;
-  read.innerHTML = `
-  <div class="card">
-    <h2>${books[i].title}</h2>
-    <div class="author">
-      ${books[i].author}
-      ${verified(books[i].author)}
+// Книга
+function openBook(id){
+  const b=books.find(x=>x.id===id);
+  openTab("book");
+  book.innerHTML=`
+    <div class="card">
+      <div class="cover"></div>
+      <div class="info">
+        <h2>${b.title}</h2>
+        <div class="author">${b.author} ${isVerified(b.author)}</div>
+        <p>${b.description}</p>
+      </div>
     </div>
-    <pre style="white-space:pre-wrap;margin-top:14px">${books[i].text}</pre>
-    <button class="like-btn" onclick="like(${i})">
-      ❤️ <span id="l${i}">${likes}</span>
-    </button>
-  </div>`;
+    <h3>Главы</h3>
+    ${b.chapters.map((c,i)=>`
+      <div class="chapter" onclick="readChapter(${id},${i})">${c.title}</div>
+    `).join("")}
+  `;
 }
 
-// Лайки
-function like(i){
-  let l = localStorage.getItem("like"+i) || 0;
-  l++;
-  localStorage.setItem("like"+i,l);
-  document.getElementById("l"+i).innerText = l;
+// Чтение
+function readChapter(id,i){
+  const b=books.find(x=>x.id===id);
+  openTab("read");
+  read.innerHTML=`
+    <div class="read">
+      <h2>${b.chapters[i].title}</h2>
+      <p>${b.chapters[i].text}</p>
+    </div>`;
 }
 
 // Авторы
-const authors = document.getElementById("authors");
+const authors=document.getElementById("authors");
 [...new Set(books.map(b=>b.author))].forEach(a=>{
-  authors.innerHTML += `
-  <div class="card">
-    <div class="author">
-      <strong>${a}</strong>
-      ${verified(a)}
-    </div>
-  </div>`;
+  authors.innerHTML+=`
+    <div class="card">
+      <div class="author"><strong>${a}</strong> ${isVerified(a)}</div>
+    </div>`;
 });
 </script>
 
