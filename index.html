@@ -6,17 +6,76 @@
 <title>Авторика — читать книги</title>
 
 <style>
-body{margin:0;font-family:system-ui;background:#121212;color:#eee}
-header{padding:20px;text-align:center;border-bottom:1px solid #333}
-nav{display:flex;justify-content:center;gap:20px;padding:10px;background:#1f1f1f}
-nav button{background:none;border:none;color:#fff;font-size:16px}
-section{display:none;padding:15px}
+:root{
+  --bg:#0f0f0f;
+  --card:#1c1c1c;
+  --text:#f2f2f2;
+  --muted:#9a9a9a;
+  --accent:#1d9bf0;
+}
+body{
+  margin:0;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont;
+  background:var(--bg);
+  color:var(--text);
+}
+header{
+  padding:20px;
+  text-align:center;
+  border-bottom:1px solid #222;
+}
+nav{
+  display:flex;
+  justify-content:center;
+  gap:24px;
+  padding:12px;
+  background:#141414;
+}
+nav button{
+  background:none;
+  border:none;
+  color:var(--text);
+  font-size:16px;
+}
+section{display:none;padding:16px}
 section.active{display:block}
-.card{background:#1e1e1e;border-radius:12px;padding:15px;margin-bottom:15px}
-.book-title{font-size:18px;font-weight:600}
-.author{color:#aaa}
-.like{margin-top:8px}
-footer{text-align:center;color:#666;padding:15px}
+.card{
+  background:var(--card);
+  border-radius:14px;
+  padding:16px;
+  margin-bottom:16px;
+}
+.book-title{
+  font-size:18px;
+  font-weight:600;
+}
+.author{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  color:var(--muted);
+  margin-top:4px;
+}
+.like-btn{
+  margin-top:12px;
+  background:none;
+  border:1px solid #333;
+  color:var(--text);
+  padding:8px 14px;
+  border-radius:20px;
+  font-size:15px;
+}
+footer{
+  text-align:center;
+  color:#666;
+  padding:20px;
+}
+
+/* Галочка */
+.verify{
+  width:16px;
+  height:16px;
+}
 </style>
 </head>
 
@@ -24,78 +83,88 @@ footer{text-align:center;color:#666;padding:15px}
 
 <header>
   <h1>Авторика</h1>
-  <p>Читайте. Пишите. Становитесь известными.</p>
+  <p style="color:var(--muted)">Платформа для писателей и читателей</p>
 </header>
 
 <nav>
-  <button onclick="openTab('feed')">📚 Лента</button>
-  <button onclick="openTab('read')">📖 Читать</button>
-  <button onclick="openTab('authors')">✍️ Авторы</button>
+  <button onclick="openTab('feed')">Лента</button>
+  <button onclick="openTab('read')">Читать</button>
+  <button onclick="openTab('authors')">Авторы</button>
 </nav>
 
 <section id="feed" class="active"></section>
-
 <section id="read"></section>
-
 <section id="authors"></section>
 
 <footer>© Авторика</footer>
 
 <script>
-// ====== АДМИН НАСТРОЙКИ ======
+// ===== АДМИН НАСТРОЙКИ =====
 const verifiedAuthors = ["Алекс Ворон"];
 
 const books = [
   {
-    title: "Тень Севера",
-    author: "Алекс Ворон",
-    text: "Глава 1\n\nХолодный ветер бил в лицо..."
+    title:"Тень Севера",
+    author:"Алекс Ворон",
+    text:"Глава 1\n\nХолодный ветер бил в лицо..."
   },
   {
-    title: "Без галочки",
-    author: "Новый Автор",
-    text: "История начинается здесь..."
+    title:"Новая история",
+    author:"Новый Автор",
+    text:"История начинается здесь..."
   }
 ];
-// ============================
+// ===========================
+
+// SVG галочка
+const verifyIcon = `
+<svg class="verify" viewBox="0 0 24 24" fill="none">
+<path d="M22 12c0 5.52-4.48 10-10 10S2 17.52 2 12 6.48 2 12 2s10 4.48 10 10z" fill="#1d9bf0"/>
+<path d="M10.5 13.5l-2-2 1.4-1.4 0.6 0.6 3.6-3.6 1.4 1.4-5 5z" fill="white"/>
+</svg>
+`;
+
+function verified(name){
+  return verifiedAuthors.includes(name) ? verifyIcon : "";
+}
 
 function openTab(id){
   document.querySelectorAll("section").forEach(s=>s.classList.remove("active"));
   document.getElementById(id).classList.add("active");
 }
 
-function isVerified(name){
-  return verifiedAuthors.includes(name) ? " 🔵✔" : "";
-}
-
-// ЛЕНТА
+// Лента
 const feed = document.getElementById("feed");
 books.forEach((b,i)=>{
   feed.innerHTML += `
-    <div class="card" onclick="openBook(${i})">
-      <div class="book-title">${b.title}</div>
-      <div class="author">${b.author}${isVerified(b.author)}</div>
+  <div class="card" onclick="openBook(${i})">
+    <div class="book-title">${b.title}</div>
+    <div class="author">
+      ${b.author}
+      ${verified(b.author)}
     </div>
-  `;
+  </div>`;
 });
 
-// ЧТЕНИЕ
+// Чтение
 function openBook(i){
   openTab("read");
   let likes = localStorage.getItem("like"+i) || 0;
-  document.getElementById("read").innerHTML = `
-    <div class="card">
-      <h2>${books[i].title}</h2>
-      <p class="author">${books[i].author}${isVerified(books[i].author)}</p>
-      <pre>${books[i].text}</pre>
-      <div class="like">
-        <button onclick="like(${i})">❤️ <span id="l${i}">${likes}</span></button>
-      </div>
+  read.innerHTML = `
+  <div class="card">
+    <h2>${books[i].title}</h2>
+    <div class="author">
+      ${books[i].author}
+      ${verified(books[i].author)}
     </div>
-  `;
+    <pre style="white-space:pre-wrap;margin-top:14px">${books[i].text}</pre>
+    <button class="like-btn" onclick="like(${i})">
+      ❤️ <span id="l${i}">${likes}</span>
+    </button>
+  </div>`;
 }
 
-// ЛАЙКИ
+// Лайки
 function like(i){
   let l = localStorage.getItem("like"+i) || 0;
   l++;
@@ -103,14 +172,16 @@ function like(i){
   document.getElementById("l"+i).innerText = l;
 }
 
-// АВТОРЫ
+// Авторы
 const authors = document.getElementById("authors");
 [...new Set(books.map(b=>b.author))].forEach(a=>{
   authors.innerHTML += `
-    <div class="card">
-      <strong>${a}${isVerified(a)}</strong>
+  <div class="card">
+    <div class="author">
+      <strong>${a}</strong>
+      ${verified(a)}
     </div>
-  `;
+  </div>`;
 });
 </script>
 
